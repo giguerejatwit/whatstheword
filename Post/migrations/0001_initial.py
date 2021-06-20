@@ -12,10 +12,11 @@ class Migration(migrations.Migration):
 
     operations = [
         migrations.CreateModel(
-            name='User',
+            name='Article',
             fields=[
-                ('id', models.IntegerField(primary_key=True, serialize=False, unique=True)),
-                ('Username', models.TextField(unique=True)),
+                ('id', models.AutoField(auto_created = True, primary_key=True, serialize=False)),
+                ('title', models.CharField(max_length=100)),
+                ('description', models.TextField()),
             ],
         ),
     ]
