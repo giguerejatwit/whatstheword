@@ -33,26 +33,39 @@ class ArticleList(APIView):
 class ArticleDetails(APIView):
     
     def get_object(self, id):
+       
         try:
-            return Article.object.get(id = id)
+
+            return Article.objects.get(id = id)
+       
         except Article.DoesNotExist:
+
             return Response(status = status.HTTP_404_NOT_FOUND)
 
     def get(self ,request, id):
-        articles =self.get_object
-        serializer =ArticleSerializer(articles)
+        
+        article = self.get_object(id)
+
+        serializer = ArticleSerializer(article)
+
         return Response(serializer.data)
 
-    def put(self, request, id):
-        articles = self.get_object(id)
-        serializer =ArticleSerializer( articles, data = request.data )
+    def post(self, request, id):
+        
+        article = self.get_object(id)
+        serializer =ArticleSerializer( article, data = request.data )
+
         if serializer.is_valid():
+
             serializer.save()
+            
             return Response(serializer.data)
         #if error
         return Response(serializer.errors,  status = status.HTTP_400_BAD_REQUEST )
 
     def delete(self, request, id):
+        
         article = self.get_object(id)
         article.delete()
+        
         return (status == status.NO_CONTENT)
