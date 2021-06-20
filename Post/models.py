@@ -1,5 +1,5 @@
 from django.db import models
-from .serializers import ArticleSerializer
+#from .serializers import ArticleSerializer
 
 # Create your models here.
 class Article(models.Model):
