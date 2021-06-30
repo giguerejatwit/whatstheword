@@ -10,5 +10,5 @@ class ArticleSerializer(serializers.ModelSerializer):
         model = Article
             #state fields
         fields = ['id', 'title', 'description']
-  
+        
     

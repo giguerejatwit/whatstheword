@@ -15,13 +15,19 @@ Including another URLconf
 """
 
 
+from django import urls
 from django.contrib import admin
-from django.urls import path
+from django.urls import path, include
+from Post.views import ArticleViewSet
+from rest_framework.routers import DefaultRouter
 from Post.views import ArticleList, ArticleDetails
 
+router = DefaultRouter()
+router.register('articles', ArticleViewSet, basename = 'articles')
 
 urlpatterns = [
+    path('', include(router.urls)),
     path('admin/', admin.site.urls),
-    path('articles/', ArticleList.as_view()),
-    path('articles/<int:id>/', ArticleDetails.as_view())
+    #path('articles/', ArticleViewSet.as_view({'get': 'list'})),
+    #path('articles/<int:pk>/', ArticleDetails.as_view())
 ]
