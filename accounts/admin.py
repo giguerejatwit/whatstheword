@@ -1,13 +1,12 @@
-
 from django.contrib import admin
-from .models import Article
+from .models import User
 
 
 # Register your models here.
 #admin.site.register(Article)
 
-@admin.register(Article)
-class ArticleModel(admin.ModelAdmin):
-    list_filter = ('id', 'description','title', )
+@admin.register(User)
+class UserModel(admin.ModelAdmin):
+    list_display = ('phone', 'password' )#'timestamp' )
     #list_display = ('title')
     #date_hierarchy
