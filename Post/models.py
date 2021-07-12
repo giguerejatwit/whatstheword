@@ -12,7 +12,7 @@ class Article(models.Model):
 
     id          = models.AutoField(auto_created = True, primary_key=True, unique=True)
     author      = models.ForeignKey(user, default=None, on_delete= models.CASCADE)
-
+    
     title       = models.CharField(max_length = 100)
     description = models.TextField()
     

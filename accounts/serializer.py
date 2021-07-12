@@ -30,6 +30,9 @@ class RegisterSerializer(serializers.ModelSerializer):
         
 
     def create(self, validated_data):
+        #if pass
+        # 
+        # #
         user = User.objects.create_user(validated_data['phone'],
                                         validated_data['password'])
         #user.save()
