@@ -5,6 +5,9 @@ from django.http import HttpResponse, Http404, JsonResponse
 from django.http.response import HttpResponseGone
 from django.shortcuts import get_object_or_404, render
 
+#allows us to authenticate tokens from knox auth
+from knox.auth import TokenAuthentication #****
+
 from rest_framework import viewsets
 from rest_framework import response
 from rest_framework import permissions
@@ -20,7 +23,7 @@ from rest_framework import status
 from rest_framework import generics
 from rest_framework import mixins
 
-#from .decorators import unauthenticated_user
+from .decorators import promoter_only
 from .models import Article
 from .serializers import ArticleSerializer
 
@@ -143,8 +146,8 @@ class ArticleDetails(generics.GenericAPIView, mixins.UpdateModelMixin,
 
 
 class ArticleViewSet(viewsets.ViewSet):
-
-
+    permission_classes =(IsAuthenticated,)
+    authentication_classes = (TokenAuthentication,)
     #
     #anyone who is authenticated can see all. 
     # 
@@ -162,11 +165,18 @@ class ArticleViewSet(viewsets.ViewSet):
     # 
     # 
     # #
+    
+
+    #@promoter_only
     def create(self, request):
+        
         serializer = ArticleSerializer(data = request.data)
         
         if serializer.is_valid():
-            serializer.save()
+            article_instance = serializer.save(commit = False)
+            #associates the article instance to a User
+            article_instance.author = request.User
+            article_instance.save()
             return Response(serializer.data, status = status.HTTP_201_CREATED)
     
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
@@ -196,7 +206,7 @@ class ArticleViewSet(viewsets.ViewSet):
         article = Article.objects.get(pk = pk)
         serializer = ArticleSerializer(article, data = request.data)
         
-        if serializer.is_valid():
+        if serializer.is_valid():    
             serializer.save()
             return response(serializer.data, status = status.HTTP_201_CREATED)
     

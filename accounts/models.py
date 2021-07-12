@@ -70,6 +70,7 @@ class User(AbstractBaseUser):
     staff       = models.BooleanField(default=False)
     admin       = models.BooleanField(default=False)
     timestamp   = models.DateTimeField
+    token       = models.CharField(max_length = 80, default= False, null = False)
 
     USERNAME_FIELD = 'phone'
     REQUIRED_FIELDS = [
@@ -94,6 +95,7 @@ class User(AbstractBaseUser):
     def has_module_perms(self, app_label):
 
         return True
+ 
 
     @property
     def is_staff(self):

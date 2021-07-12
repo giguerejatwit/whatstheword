@@ -1,17 +1,21 @@
 from django.db import models
 from django.conf import settings
+from django.db.models.deletion import CASCADE
 from rest_framework.authtoken.serializers import AuthTokenSerializer
 
-#User = settings.AUTH_USER_MODEL
-from accounts.models import User
+user = settings.AUTH_USER_MODEL
+
 
 class Article(models.Model):
     
    #null us true for now bc we have data in DB, dont want err #creates relationship with user api
 
     id          = models.AutoField(auto_created = True, primary_key=True, unique=True)
+    author      = models.ForeignKey(user, default=None, on_delete= models.CASCADE)
+
     title       = models.CharField(max_length = 100)
     description = models.TextField()
+    
     #uid         = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     #./user_id      = models.BigIntegerField(default=False)
     #picture = models.ImaseField()

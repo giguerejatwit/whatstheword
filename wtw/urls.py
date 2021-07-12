@@ -14,6 +14,8 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 
+from knox.views import LogoutAllView, LogoutView
+from accounts.views import RegisterAPI, LoginAPI, ChangePasswordView
 
 from django import urls
 from django.conf.urls import url
@@ -21,9 +23,7 @@ from django.contrib import admin
 from django.urls import path, include
 
 from Post.views import ArticleViewSet
-#from Post.views import ArticleList, ArticleDetails
 
-from accounts.views import registration_view
 from rest_framework.routers import DefaultRouter
 from rest_framework.authtoken.views import obtain_auth_token
 
@@ -32,8 +32,12 @@ router.register('wtw/articles', ArticleViewSet, basename = 'articles')
 #router.register('wtw/accounts', RegisterAPI, basename='register')
 urlpatterns = [
     path('', include(router.urls)),
+
     path('admin/', admin.site.urls),
-    #path('wtw/articleDetails/', ArticleDetails, name = 'articleDetails'),
-    path('wtw/register', registration_view, name='register'),
-    path('wtw/login', obtain_auth_token, name = 'login')
+
+    path('wtw/register', RegisterAPI.as_view(), name='register'),
+    path('wtw/login/', LoginAPI.as_view(), name = 'login'),
+    path('wtw/logout/', LogoutView.as_view(), name ='Logout'),
+    path('wtw/change-password', ChangePasswordView.as_view(), name = 'change_password'),
+
 ]

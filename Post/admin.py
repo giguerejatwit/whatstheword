@@ -8,6 +8,6 @@ from .models import Article
 
 @admin.register(Article)
 class ArticleModel(admin.ModelAdmin):
-    list_filter = ('id', 'description','title', )
+    list_filter = ('id','author', 'description','title', )
     #list_display = ('title')
     #date_hierarchy
