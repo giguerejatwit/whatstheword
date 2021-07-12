@@ -1,28 +1,26 @@
 #from Post.decorators import unauthenticated_user
 from django.shortcuts import redirect
-from knox.auth import TokenAuthentication
-from rest_framework import generics, permissions, serializers
-
-from rest_framework.decorators import api_view
-from rest_framework.response import Response
-from rest_framework.authtoken.models import Token
-from rest_framework.permissions import IsAuthenticated
-
-from .serializer import UserSerializer, RegisterSerializer
-from .models import User
-from knox.models import AuthToken
 from django.contrib.auth import login
-from rest_framework.authtoken.serializers import AuthTokenSerializer
-from knox.views import LoginView as KnoxLoginView, LogoutAllView
 
-from rest_framework import status
-from rest_framework import generics
+from knox.auth import TokenAuthentication
+from knox.models import AuthToken
+from knox.views import LoginView as KnoxLoginView
+
+from rest_framework import generics, permissions, status
+
 from rest_framework.response import Response
-from django.contrib.auth.models import User
-from .serializer import ChangePasswordSerializer
-from rest_framework.permissions import IsAuthenticated  
-# Register API
+from rest_framework.permissions import IsAuthenticated
+from rest_framework.authtoken.serializers import AuthTokenSerializer
+from rest_framework.response import Response
 
+from .serializer import UserSerializer, RegisterSerializer, ChangePasswordSerializer
+from .models import User
+
+#from django.contrib.auth.models import User
+ 
+# Register API
+#
+###
 class RegisterAPI(generics.GenericAPIView):
     serializer_class = RegisterSerializer
 
@@ -36,6 +34,10 @@ class RegisterAPI(generics.GenericAPIView):
         "token": AuthToken.objects.create(user)[1]
         })
 
+#
+# LoginAPI
+# 
+# #
 class LoginAPI(KnoxLoginView):
     permission_classes = (permissions.AllowAny,)
 
@@ -47,6 +49,10 @@ class LoginAPI(KnoxLoginView):
         
         return super(LoginAPI, self).post(request, format=None)
 
+#
+# ChangePasswordView
+# 
+# #
 class ChangePasswordView(generics.UpdateAPIView):
     """
     An endpoint for changing password.

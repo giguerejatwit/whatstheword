@@ -18,12 +18,12 @@ def unauthenticated_user(view_func):
 # 
 # 
 # #
-def promoter_only(allowed_rules =[]):
-    def decorator(view_func):
-        def wrapper_func(request, *args, **kwargs):
+def promoter_only(view_func):
+        def wrapper_func(request):
             #if a user is a promoter they should be able to post.
-            if request.User.is_promoter == True:
+            if request.user.is_promoter == True:
                 return True
+            return wrapper_func
                # group = request.user.all([0], name)
-            return  view_func(request, *args, **kwargs)
-    return decorator
+         
+        return promoter_only
