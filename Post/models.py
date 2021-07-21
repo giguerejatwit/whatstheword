@@ -10,12 +10,12 @@ class Article(models.Model):
     
    #null us true for now bc we have data in DB, dont want err #creates relationship with user api
 
-    id          = models.AutoField(auto_created = True, primary_key=True, unique=True)
-    author      = models.ForeignKey(user, default=None, on_delete= models.CASCADE)
+    id          = models.AutoField(auto_created = True, primary_key=True, unique=True,)
+    author      = models.ForeignKey(user, default=None, on_delete= models.CASCADE,)
     
-    title       = models.CharField(max_length = 100)
+    title       = models.CharField(max_length = 100,)
     description = models.TextField()
-    
+    image = models.ImageField(null = True, blank = True, )
     #uid         = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     #./user_id      = models.BigIntegerField(default=False)
     #picture = models.ImaseField()

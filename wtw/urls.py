@@ -35,9 +35,9 @@ urlpatterns = [
 
     path('admin/', admin.site.urls),
 
-    path('wtw/register', RegisterAPI.as_view(), name='register'),
+    path('wtw/register/', RegisterAPI.as_view(), name='register'),
     path('wtw/login/', LoginAPI.as_view(), name = 'login'),
     path('wtw/logout/', LogoutView.as_view(), name ='Logout'),
-    path('wtw/change-password', ChangePasswordView.as_view(), name = 'change_password'),
+    path('wtw/change-password/', ChangePasswordView.as_view(), name = 'change_password'),
 
 ]
