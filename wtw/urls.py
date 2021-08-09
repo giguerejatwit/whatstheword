@@ -14,6 +14,8 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 
+from accounts.views import ProfilePostsAPI
+from accounts.views import ProfileAPI
 from knox.views import LogoutAllView, LogoutView
 from accounts.views import RegisterAPI, LoginAPI, ChangePasswordView
 
@@ -27,11 +29,16 @@ from Post.views import ArticleViewSet
 from rest_framework.routers import DefaultRouter
 from rest_framework.authtoken.views import obtain_auth_token
 
+from django.conf import settings
+from django.conf.urls.static import static
+
 router = DefaultRouter()
-router.register('wtw/articles', ArticleViewSet, basename = 'articles')
+router.register('articles', ArticleViewSet, basename = 'articles')
+router.register('profiles', ProfileAPI, basename='profiles')
+router.register('profiles/uploads', ProfilePostsAPI, basename= 'profile/uploads')
 #router.register('wtw/accounts', RegisterAPI, basename='register')
 urlpatterns = [
-    path('', include(router.urls)),
+    path('wtw/', include(router.urls)),
 
     path('admin/', admin.site.urls),
 
@@ -39,5 +46,11 @@ urlpatterns = [
     path('wtw/login/', LoginAPI.as_view(), name = 'login'),
     path('wtw/logout/', LogoutView.as_view(), name ='Logout'),
     path('wtw/change-password/', ChangePasswordView.as_view(), name = 'change_password'),
+    #path('wtw/profile/', ProfileAPI.as_view(), name = 'profile')
 
 ]
+if settings.DEBUG:
+    urlpatterns += static(settings.STATIC_URL,
+                        document_root = settings.STATIC_ROOT)
+    urlpatterns += static(settings.MEDIA_URL,
+                        document_root = settings.MEDIA_ROOT)

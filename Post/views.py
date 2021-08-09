@@ -4,6 +4,7 @@ from django.db.models.query import QuerySet
 from django.http import HttpResponse, Http404, JsonResponse
 from django.http.response import HttpResponseGone
 from django.shortcuts import get_object_or_404, render
+from django.views.decorators.csrf import requires_csrf_token
 
 #allows us to authenticate tokens from knox auth
 from knox.auth import TokenAuthentication
@@ -159,7 +160,7 @@ class ArticleViewSet(viewsets.ViewSet):
         articles = Article.objects.all()
         serializers = ArticleSerializer(articles, many = True) #bc its a QuerySet
         return Response(serializers.data)
-
+        print(request.data)
 
     #
     # creating is only for is_promoter == true
@@ -169,23 +170,21 @@ class ArticleViewSet(viewsets.ViewSet):
     def create(self, request):
         
         article_serializer = ArticleSerializer(data = request.data)
-        
-           
         if article_serializer.is_valid():
             #only can create if User is a promoter
-            if self.request.user.is_promoter:
+            #if self.request.user.is_promoter:
                 #associates the article instance to a User
-                article_serializer.save(author = self.request.user)
+                article_serializer.save()
+
         
-            else:
-                return Response('User does not have Promoter permissions')
+            #else:
+                #return Response('User does not have Promoter permissions')
     
 
-            return Response(article_serializer.data, status = status.HTTP_201_CREATED)
+                return Response(article_serializer.data, status = status.HTTP_201_CREATED)
     
         return Response(article_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     
-
     #
     # anyone can retrieve but some are readOnly only if they are NOT the owner
     # 
@@ -212,7 +211,7 @@ class ArticleViewSet(viewsets.ViewSet):
         
         if serializer.is_valid():    
             serializer.save()
-            return response(serializer.data, status = status.HTTP_201_CREATED)
+            return Response(serializer.data, status = status.HTTP_201_CREATED)
     
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
