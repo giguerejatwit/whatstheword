@@ -1,10 +1,12 @@
 # from Post.decorators import unauthenticated_user
 from copy import error
+from django import http
 
 from django.contrib.auth import login
 from django.core.checks.messages import ERROR
 from django.db.models import query
 from django.db.models.query import QuerySet
+from django.dispatch.dispatcher import NONE_ID
 from django.http import Http404, HttpResponse, JsonResponse
 from django.http.response import HttpResponseGone
 from django.shortcuts import get_object_or_404, redirect, render
@@ -16,6 +18,7 @@ from knox.auth import TokenAuthentication
 from knox.models import User  # ****
 from knox.models import AuthToken
 from knox.views import LoginView as KnoxLoginView
+from rest_framework.fields import to_choices_dict
 from Post.models import Article
 from Post.serializers import ArticleSerializer
 from Post.views import ArticleViewSet
@@ -23,6 +26,7 @@ from rest_framework import (
     generics,
     mixins,
     permissions,
+    relations,
     response,
     serializers,
     status,
@@ -30,7 +34,12 @@ from rest_framework import (
     viewsets,
 )
 from rest_framework.authtoken.serializers import AuthTokenSerializer
-from rest_framework.decorators import APIView, permission_classes
+from rest_framework.decorators import (
+    APIView,
+    api_view,
+    authentication_classes,
+    permission_classes,
+)
 from rest_framework.parsers import JSONParser
 from rest_framework.permissions import IsAuthenticated, IsAuthenticatedOrReadOnly
 from rest_framework.relations import PrimaryKeyRelatedField
@@ -38,30 +47,53 @@ from rest_framework.response import Response
 from rest_framework.serializers import Serializer
 
 # from .decorators import promoter_only
-from .models import Article, User, UserProfile
+from .models import FollowerRelation, User, UserProfile
 from .serializer import (
     ChangePasswordSerializer,
+    ProfileEditSerializer,
     RegisterSerializer,
     UserProfileSerializer,
     UserSerializer,
+    followSerializer,
 )
 
-# from .serializers import ArticleSerializer
-class addFollower(View):
-    
-    def post(self, request, pk, *args, **kwargs):
-        #lets get the follower
-        profile = UserProfile.objects.get(pk=pk)
-        #the current user will be added to the following of the profile being followed
-        profile.followers.add(request.user)
 
-class addFollower(View):
-    
-    def post(self, request, pk, *args, **kwargs):
-        #lets get the follower
-        profile = UserProfile.objects.get(pk=pk)
-        #the current user will be added to the following of the profile being followed
-        profile.followers.remove(request.user)
+@api_view(["POST"])
+@permission_classes([IsAuthenticated])
+@authentication_classes([TokenAuthentication])
+def followUser(request, pk=None, *args, **kwargs):
+    # a class to follow a another user
+
+    is_following = False
+
+    user_ = request.user
+    profile_ = UserProfile.objects.get(user=pk)
+
+    # check follower count of focused profile
+    follower_count = profile_.followers.count()
+    # check if user is in the list of followers of the profile.followers
+    follower_list = profile_.followers.all()
+
+    if user_ in follower_list:
+        is_following = True
+
+    if is_following == False:
+        relation = FollowerRelation.objects.create(user=user_, profile=profile_)
+        profile_.followers.add(user_)
+
+        return HttpResponse(
+            f"{user_.name} followed {profile_.name} \n {profile_.followers.all(),  is_following} \n {follower_count}"
+        )
+
+    elif is_following == True:
+        relation = FollowerRelation.objects.filter(
+            user=user_, profile=profile_
+        ).delete()
+        profile_.followers.remove(user_)
+
+        return HttpResponse(
+            f"{user_.name} unfollowed {profile_.name}, {is_following}",
+        )
 
 
 class ProfileAPI(viewsets.ViewSet):
@@ -69,14 +101,34 @@ class ProfileAPI(viewsets.ViewSet):
     authentication_classes = (TokenAuthentication,)
 
     def retrieve(self, request, pk=None):
+        # curr_user = request.user
         try:
             QuerySet = UserProfile.objects.all()
-            user = get_object_or_404(QuerySet, pk=pk)
-            userSerializers = UserProfileSerializer(user)
-            user_id = getattr(user, "user")
-            return Response(userSerializers.data)
+            user_ = get_object_or_404(QuerySet, pk=pk)
+            UserSerializers = UserProfileSerializer(user_)
+
+            return Response(UserSerializers.data)
         except error:
             print(error)
+
+    def update(self, request, pk=None):
+        '''
+        update() is function of the Profile API, that allows users to edit their profile 
+        '''
+        try:
+            user = request.user
+            profile = UserProfile.objects.get(user=pk)
+            #check if request is by by profile's user
+            if user != profile.user:
+                return HttpResponse("invalid credentials")
+            else:
+                serializers = ProfileEditSerializer(profile, data=request.data)
+                if serializers.is_valid():
+                    serializers.save()
+                # return Response(serializers.data, status=status.HTTP_201_CREATED)
+            return Response(serializers.data)
+        except (error):
+            return HttpResponse(error)
 
 
 class ProfilePostsAPI(viewsets.ViewSet):
@@ -85,12 +137,12 @@ class ProfilePostsAPI(viewsets.ViewSet):
 
     def retrieve(self, request, pk=None):
         try:
-            QuerySet = UserProfile.objects.all()
-            user = get_object_or_404(QuerySet, pk=pk)
-            userSerializers = UserProfileSerializer(user)
-            user_id = getattr(user, "user")
-            userArticles = Article.objects.filter(author_id=user_id)
+
+            userProfile = UserProfile.objects.get(user=pk)
+            userArticles = Article.objects.filter(author=userProfile)
+            # userArticles = Article.objects.filter(author=user_)
             articleSerializer = ArticleSerializer(userArticles, many=True)
+
             return Response(articleSerializer.data)
         except error:
             print(error)
@@ -109,7 +161,7 @@ class RegisterAPI(generics.GenericAPIView):
         user = serializer.save()
         return Response(
             {
-                # returns the given fields of UserSerializer
+                # returns the given fields of U serSerializer
                 "user": UserSerializer(
                     user, context=self.get_serializer_context()
                 ).data,
