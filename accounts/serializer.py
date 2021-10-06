@@ -93,7 +93,7 @@ class RegisterSerializer(serializers.ModelSerializer):
             "dob",
             "password",
             "location",
-            "hasAgreedTOS"
+            "has_agreed_tos"
         ]
         extra_kwargs = {"password": {"write_only": True}}
 
