@@ -157,14 +157,14 @@ class ArticleDetails(generics.GenericAPIView, mixins.UpdateModelMixin,
 """
 
 
-@api_view(["POST"])
+@api_view(["PUT"])
 @permission_classes([IsAuthenticated])
 @authentication_classes([TokenAuthentication])
 def LikeView(request, pk):
 
     user_ = request.user
 
-    article = get_object_or_404(Article, id=request.data.get("id"))
+    article = get_object_or_404(Article, id=pk)
 
     hasLiked = user_ in article.likes.all()
     if hasLiked == False:
@@ -180,8 +180,6 @@ def LikeView(request, pk):
         except (error):
             return Response(error)
 
-    return Response(None)
-
 
 class ArticleViewSet(viewsets.ViewSet):
     permission_classes = (IsAuthenticated,)
@@ -196,8 +194,9 @@ class ArticleViewSet(viewsets.ViewSet):
         for article in articles:
             pass
             # print(article.author.avatar)
-        serializers = ArticleSerializer(articles, many=True)
-        presentedList = {None}
+        serializers = ArticleSerializer(
+            articles, many=True, context={"request": request}
+        )
 
         # bc its a QuerySet
         return Response(serializers.data)
@@ -243,7 +242,7 @@ class ArticleViewSet(viewsets.ViewSet):
     #
     def update(self, request, pk=None):
         user = request.user
-        
+
         article = Article.objects.get(pk=pk)
         print(type(user))
         user = str(user)

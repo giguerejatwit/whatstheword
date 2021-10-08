@@ -31,19 +31,16 @@ class ArticleSerializer(serializers.ModelSerializer):
 
         return name_
 
+    
     def _isLiked(self, article):
-        user = None
-        request = self.context.get("request")
-        if request and hasattr(request, "user"):
-            user = request.user
+        user = self.context['request'].user
         
-        likes = article.likes
-        isLiked = False
 
-        for x in likes.all():
-            print(x)
-            if x == user:
-                isLiked = True
+        
+        # likes = article.likes
+        isLiked = False
+        hasLiked = user in article.likes.all()
+        isLiked = hasLiked
 
         return isLiked
 
