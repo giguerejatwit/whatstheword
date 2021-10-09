@@ -1,43 +1,31 @@
 from copy import error
+
 from accounts.models import UserProfile
 from django.conf.urls.static import static
 from django.core.checks.messages import ERROR
 from django.db.models import query
 from django.db.models.query import QuerySet
-from django.http import HttpResponse, Http404, JsonResponse
+from django.http import Http404, HttpResponse, JsonResponse
 from django.http.response import HttpResponseGone
 from django.shortcuts import get_object_or_404, render
 from django.views.decorators.csrf import requires_csrf_token
-
 # allows us to authenticate tokens from knox auth
 from knox.auth import TokenAuthentication
 from knox.models import User
-
-from rest_framework import viewsets
-from rest_framework import response
-from rest_framework import permissions
-from rest_framework import serializers
-
-from rest_framework.decorators import APIView, api_view, permission_classes
+from rest_framework import (generics, mixins, permissions, response,
+                            serializers, status, viewsets)
+from rest_framework.decorators import (APIView, api_view,
+                                       authentication_classes,
+                                       permission_classes)
+from rest_framework.parsers import JSONParser
+from rest_framework.permissions import (IsAuthenticated,
+                                        IsAuthenticatedOrReadOnly)
 from rest_framework.response import Response
 from rest_framework.serializers import Serializer
-from rest_framework.parsers import JSONParser
-from rest_framework.response import Response
-from rest_framework.permissions import IsAuthenticated, IsAuthenticatedOrReadOnly
-from rest_framework import status
-
-from rest_framework import generics
-from rest_framework import mixins
 
 from .decorators import promoter_only
 from .models import Article
-from .serializers import ArticleSerializer, ArticleEditSerializer
-from rest_framework.decorators import (
-    APIView,
-    api_view,
-    authentication_classes,
-    permission_classes,
-)
+from .serializers import ArticleEditSerializer, ArticleSerializer
 
 # Create your views here.
 """
@@ -195,7 +183,7 @@ class ArticleViewSet(viewsets.ViewSet):
             pass
             # print(article.author.avatar)
         serializers = ArticleSerializer(
-            articles, many=True, context={"request": request}
+            articles, many=True, context={'request': request}
         )
 
         # bc its a QuerySet

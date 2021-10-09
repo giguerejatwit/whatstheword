@@ -11,6 +11,6 @@ class FollowRelation(admin.ModelAdmin):
 
 @admin.register(User)
 class UserModel(admin.ModelAdmin):
-    list_display = ('phone','username', 'location' )#'timestamp' )
+    list_display = ('phone','username', )#'timestamp' )
     #list_display = ('title')
     #date_hierarchy

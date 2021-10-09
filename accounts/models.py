@@ -1,5 +1,3 @@
-
-
 import os
 import random
 
@@ -17,14 +15,17 @@ from rest_framework.authtoken.models import Token
 
 class UserManager(BaseUserManager):
     def create_user(
-        self, phone, password, is_staff=False, is_active=True, is_admin=False
+        self, phone, password, username, is_staff=False, is_active=True, is_admin=False
     ):
         if not phone:
             raise ValueError("users must have a phone number")
+        if not username:
+            raise ValueError("users must have a username")
         if not password:
-            raise ValueError("user must have a password")
+            raise ValueError("users must have a password")
 
         user_obj = self.model(phone=phone)
+        user_obj.username = username
         user_obj.set_password(password)
         user_obj.staff = is_staff
         user_obj.admin = is_admin
@@ -56,17 +57,17 @@ class User(AbstractBaseUser):
         message="Phone number must be entered in the format: '+999999999'. Up to 14 digits allowed.",
     )
     phone = models.CharField(
-        validators=[phone_regex], max_length=17, primary_key= True, unique=True
+        validators=[phone_regex], max_length=17, primary_key=True, unique=True
     )
     # email = models.EmailField()
     avatar = models.ImageField(
         upload_to="media/profilePictures",
         default="media/profilePictures/default-avatar.png",
     )
-    
-    username = models.CharField(max_length=20, blank=True, unique=True)
+
+    username = models.CharField(max_length=20, unique=True)
     standard = models.CharField(max_length=3, blank=True, null=True)
-    location = models.CharField(max_length=100, blank=True, null=True)
+    
     score = models.IntegerField(default=16)
     password = models.CharField(max_length=200)
     first_login = models.BooleanField(default=False)
@@ -76,7 +77,7 @@ class User(AbstractBaseUser):
     admin = models.BooleanField(default=False)
     address = models.CharField(max_length=50, default="null", null=False)
     dob = models.CharField(max_length=8, null=False, default="00000000")
-    email = models.EmailField(max_length = 254, null= True)
+    email = models.EmailField(max_length=254, null=True)
     has_agreed_tos = models.BooleanField(default=False)
 
     USERNAME_FIELD = "phone"
@@ -87,7 +88,7 @@ class User(AbstractBaseUser):
     objects = UserManager()
 
     def __str__(self):
-        return self.phone
+        return self.username
 
     def get_full_name(self):
         return self.phone
@@ -134,8 +135,11 @@ class UserProfile(models.Model):
     )
 
     name = models.CharField(max_length=30, blank=True, null=True)
-    bio = models.TextField(null= True)
-    avatar = models.ImageField(upload_to="media/profilePictures", default="/media/profilePictures/default-avatar.png")
+    bio = models.TextField(null=True)
+    avatar = models.ImageField(
+        upload_to="media/profilePictures",
+        default="/media/profilePictures/default-avatar.png",
+    )
     followers = models.ManyToManyField(
         settings.AUTH_USER_MODEL,
         blank=True,
@@ -149,7 +153,7 @@ class UserProfile(models.Model):
     # blocked = models.ManyToManyField(settings.AUTH_USER_MODEL, blank = True, related_name= "followers", symmetrical=False)
     # is_private
     def __str__(self):
-        return (f"{self.user}'s Profile")
+        return f"{self.user}'s Profile"
 
 
 @receiver(post_save, sender=User)

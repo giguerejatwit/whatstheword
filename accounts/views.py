@@ -1,7 +1,7 @@
 # from Post.decorators import unauthenticated_user
 from copy import error
-from django import http
 
+from django import http
 from django.contrib.auth import login
 from django.core.checks.messages import ERROR
 from django.db.models import query
@@ -18,7 +18,6 @@ from knox.auth import TokenAuthentication
 from knox.models import User  # ****
 from knox.models import AuthToken
 from knox.views import LoginView as KnoxLoginView
-from rest_framework.fields import to_choices_dict
 from Post.models import Article
 from Post.serializers import ArticleSerializer
 from Post.views import ArticleViewSet
@@ -40,6 +39,7 @@ from rest_framework.decorators import (
     authentication_classes,
     permission_classes,
 )
+from rest_framework.fields import to_choices_dict
 from rest_framework.parsers import JSONParser
 from rest_framework.permissions import IsAuthenticated, IsAuthenticatedOrReadOnly
 from rest_framework.relations import PrimaryKeyRelatedField
@@ -101,10 +101,11 @@ class ProfileAPI(viewsets.ViewSet):
     authentication_classes = (TokenAuthentication,)
 
     def retrieve(self, request, pk=None):
-        # curr_user = request.user
+        
         try:
-            QuerySet = UserProfile.objects.all()
-            user_ = get_object_or_404(QuerySet, pk=pk)
+            user_ = UserProfile.objects.get(user=pk)
+            print(user_)
+
             UserSerializers = UserProfileSerializer(user_)
 
             return Response(UserSerializers.data)
@@ -112,13 +113,13 @@ class ProfileAPI(viewsets.ViewSet):
             print(error)
 
     def update(self, request, pk=None):
-        '''
-        update() is function of the Profile API, that allows users to edit their profile 
-        '''
+        """
+        update() is function of the Profile API, that allows users to edit their profile
+        """
         try:
             user = request.user
             profile = UserProfile.objects.get(user=pk)
-            #check if request is by by profile's user
+            # check if request is by by profile's user
             if user != profile.user:
                 return HttpResponse("invalid credentials")
             else:
@@ -137,11 +138,10 @@ class ProfilePostsAPI(viewsets.ViewSet):
 
     def retrieve(self, request, pk=None):
         try:
-
             userProfile = UserProfile.objects.get(user=pk)
             userArticles = Article.objects.filter(author=userProfile)
             # userArticles = Article.objects.filter(author=user_)
-            articleSerializer = ArticleSerializer(userArticles, many=True)
+            articleSerializer = ArticleSerializer(userArticles, many=True,  context={'request': request})
 
             return Response(articleSerializer.data)
         except error:
@@ -156,12 +156,16 @@ class RegisterAPI(generics.GenericAPIView):
     serializer_class = RegisterSerializer
 
     def post(self, request, *args, **kwargs):
-        serializer = self.get_serializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
-        user = serializer.save()
+        user = None
+        data = request.data
+        serializer = RegisterSerializer(data=data)
+
+        if serializer.is_valid():
+            user = serializer.save()
+
         return Response(
             {
-                # returns the given fields of U serSerializer
+                # returns the given fields of UserSerializer
                 "user": UserSerializer(
                     user, context=self.get_serializer_context()
                 ).data,

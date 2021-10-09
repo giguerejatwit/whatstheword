@@ -17,20 +17,22 @@ class UserSerializer(serializers.ModelSerializer):
         fields = [
             "phone",
             "username",
-            "location",
+            "has_agreed_tos",
         ]
+
+
 class ProfileEditSerializer(serializers.ModelSerializer):
     class Meta:
-        model =UserProfile
-        fields =[ 
+        model = UserProfile
+        fields = [
             "name",
             "bio",
             "avatar",
             "instagramID",
             "snapchatID",
             "linkedinID",
-            
         ]
+
 
 class UserProfileSerializer(serializers.ModelSerializer):
     email = serializers.SerializerMethodField("_getEmail")
@@ -38,31 +40,30 @@ class UserProfileSerializer(serializers.ModelSerializer):
     def _getEmail(self, profile):
         profile = getattr(profile, "user")
         
-        user = User.objects.get(phone = profile)
+        user = User.objects.get(phone = profile.phone)
         return user.email
     
     def _getUsername(self, profile):
          profile = getattr(profile, "user")
-         user = User.objects.get(phone = profile)
+         user = User.objects.get(phone = profile.phone)
+         print(user)
          return user.username
+
     class Meta:
         model = UserProfile
         fields = [
             "user",
-            "username",
+            "email",
             "name",
             "bio",
-            "email",
+            "username", 
             "avatar",
             "instagramID",
             "snapchatID",
             "linkedinID",
-            "followers",    
+            "followers",
         ]
 
-    
-        
-        
 
 class followSerializer(serializers.ModelSerializer):
     followers = UserProfileSerializer(
@@ -71,7 +72,8 @@ class followSerializer(serializers.ModelSerializer):
     following = UserProfileSerializer(
         many=True,
     )  # read_only = True)?
-    class Meta: 
+
+    class Meta:
         model = UserProfile
         fields = [
             "followers",
@@ -79,7 +81,7 @@ class followSerializer(serializers.ModelSerializer):
         ]
 
 
-# 
+#
 # gives fields to http://127.0.0.1:8000/wtw/register/
 #
 # #
@@ -90,18 +92,17 @@ class RegisterSerializer(serializers.ModelSerializer):
             "phone",
             "username",
             "email",
-            "dob",
             "password",
-            "location",
-            "has_agreed_tos"
         ]
         extra_kwargs = {"password": {"write_only": True}}
 
     def create(self, validated_data):
         user = User.objects.create_user(
-            validated_data["phone"], validated_data["password"]
+            validated_data["phone"],
+            validated_data["password"],
+            validated_data["username"],
         )
-        # user.save()
+        user.save()
         return user
 
 

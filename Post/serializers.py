@@ -33,11 +33,7 @@ class ArticleSerializer(serializers.ModelSerializer):
 
     
     def _isLiked(self, article):
-        user = self.context['request'].user
-        
-
-        
-        # likes = article.likes
+        user = self.context["request"].user
         isLiked = False
         hasLiked = user in article.likes.all()
         isLiked = hasLiked
