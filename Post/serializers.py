@@ -16,6 +16,7 @@ class ArticleSerializer(serializers.ModelSerializer):
     avatar = serializers.SerializerMethodField("_get_Avatar")
     name = SerializerMethodField("_get_Name")
     isLiked = SerializerMethodField("_isLiked")
+    likeCount = SerializerMethodField("_likeCount")
 
     def _get_Avatar(self, article):
         user = getattr(article, "author")
@@ -39,6 +40,9 @@ class ArticleSerializer(serializers.ModelSerializer):
         isLiked = hasLiked
 
         return isLiked
+    
+    def _likeCount(self, article):
+        return article.likes.count()
 
     class Meta:
         # create model
@@ -60,6 +64,7 @@ class ArticleSerializer(serializers.ModelSerializer):
             "longitude",
             "latitude",
             "isLiked",
+            "likeCount"
         ]
 
 
