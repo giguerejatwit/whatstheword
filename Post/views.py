@@ -232,7 +232,6 @@ class ArticleViewSet(viewsets.ViewSet):
         user = request.user
 
         article = Article.objects.get(pk=pk)
-        print(type(user))
         user = str(user)
 
         if user != article.author_id:
@@ -258,8 +257,9 @@ class ArticleViewSet(viewsets.ViewSet):
         author = article.author_id
 
         user = request.user
-        user = str(user)
-
+        #user = str(user)
+        user = user.phone
+        
         if user != author:
             return Response(
                 f"User: {user} {type(user)} {type(author)} cannot delete \n property of {author}"
