@@ -9,17 +9,27 @@ from django.http import Http404, HttpResponse, JsonResponse
 from django.http.response import HttpResponseGone
 from django.shortcuts import get_object_or_404, render
 from django.views.decorators.csrf import requires_csrf_token
+
 # allows us to authenticate tokens from knox auth
 from knox.auth import TokenAuthentication
 from knox.models import User
-from rest_framework import (generics, mixins, permissions, response,
-                            serializers, status, viewsets)
-from rest_framework.decorators import (APIView, api_view,
-                                       authentication_classes,
-                                       permission_classes)
+from rest_framework import (
+    generics,
+    mixins,
+    permissions,
+    response,
+    serializers,
+    status,
+    viewsets,
+)
+from rest_framework.decorators import (
+    APIView,
+    api_view,
+    authentication_classes,
+    permission_classes,
+)
 from rest_framework.parsers import JSONParser
-from rest_framework.permissions import (IsAuthenticated,
-                                        IsAuthenticatedOrReadOnly)
+from rest_framework.permissions import IsAuthenticated, IsAuthenticatedOrReadOnly
 from rest_framework.response import Response
 from rest_framework.serializers import Serializer
 
@@ -158,13 +168,13 @@ def LikeView(request, pk):
     if hasLiked == False:
         try:
             article.likes.add(user_)
-            return Response(True)
+            return Response({"isLiked": True, "likeCount": article.likes.count()})
         except (error):
             return Response(error)
     else:
         try:
             article.likes.remove(user_)
-            return Response(False)
+            return Response({"isLiked": False, "likeCount": article.likes.count()})
         except (error):
             return Response(error)
 
@@ -183,7 +193,7 @@ class ArticleViewSet(viewsets.ViewSet):
             pass
             # print(article.author.avatar)
         serializers = ArticleSerializer(
-            articles, many=True, context={'request': request}
+            articles, many=True, context={"request": request}
         )
 
         # bc its a QuerySet
@@ -257,9 +267,9 @@ class ArticleViewSet(viewsets.ViewSet):
         author = article.author_id
 
         user = request.user
-        #user = str(user)
+        # user = str(user)
         user = user.phone
-        
+
         if user != author:
             return Response(
                 f"User: {user} {type(user)} {type(author)} cannot delete \n property of {author}"
