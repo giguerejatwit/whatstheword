@@ -64,14 +64,15 @@ from .serializer import (
 def followUser(request, *args, **kwargs):
     # a class to follow a another user
     is_following = False
-    prof = request.POST["profile"]
+    prof = request.data.get("profile")
 
-    profile_ = UserProfile.objects.get(user=prof)
+    
+    profile_ = UserProfile.objects.get(user_id=prof)
     profile_username = profile_.user
-    print(profile_username)
+    
 
     user_ = User.objects.get(username=request.user)
-    print(user_)
+    
 
     # check follower count of focused profile
     follower_count = profile_.followers.count()
@@ -89,7 +90,7 @@ def followUser(request, *args, **kwargs):
             {
                 "isFollowing": True,
                 "followCount": follower_count,
-                "response": f"{user_.username} followed {profile_.user}",
+                "response": f"{user_.username} followed {profile_username}",
             }
         )
 
@@ -103,7 +104,7 @@ def followUser(request, *args, **kwargs):
             {
                 "isFollowing": False,
                 "followCount": follower_count,
-                "response": f"{user_.username} unfollowed {profile_.user}",
+                "response": f"{user_.username} unfollowed {profile_username}",
             }
         )
 
