@@ -40,10 +40,10 @@ router.register("profiles/uploads", ProfilePostsAPI, basename="profile/uploads")
 urlpatterns = [
     path("wtw/", include(router.urls)),
     path("admin/", admin.site.urls),
-    path("wtw/follow/<int:pk>/", followUser, name="follow"),
+    path("wtw/follow/", followUser, name="follow"),
     path("wtw/like/<int:pk>/", LikeView, name = 'Like'),
     path("wtw/register/", RegisterAPI.as_view(), name="register"),
-    path("wtw/login/", LoginAPI.as_view(), name="login"),
+    path("wtw//", LoginAPI.as_view(), name="login"),
     path("wtw/logout/", LogoutView.as_view(), name="Logout"),
     path("wtw/change-password/", ChangePasswordView.as_view(), name="change_password"),
     # path('wtw/profile/', ProfileAPI.as_view(), name = 'profile')
