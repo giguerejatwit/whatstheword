@@ -1,7 +1,7 @@
 # from Post.decorators import unauthenticated_user
 from copy import error
 
-from django import http
+from django import db, http
 from django.contrib.auth import login
 from django.core.checks.messages import ERROR
 from django.db.models import query
@@ -61,13 +61,17 @@ from .serializer import (
 @api_view(["POST"])
 @permission_classes([IsAuthenticated])
 @authentication_classes([TokenAuthentication])
-def followUser(request, pk=None, *args, **kwargs):
+def followUser(request, *args, **kwargs):
     # a class to follow a another user
-
     is_following = False
+    prof = request.POST["profile"]
 
-    user_ = request.user
-    profile_ = UserProfile.objects.get(user=pk)
+    profile_ = UserProfile.objects.get(user=prof)
+    profile_username = profile_.user
+    print(profile_username)
+
+    user_ = User.objects.get(username=request.user)
+    print(user_)
 
     # check follower count of focused profile
     follower_count = profile_.followers.count()
@@ -81,8 +85,12 @@ def followUser(request, pk=None, *args, **kwargs):
         relation = FollowerRelation.objects.create(user=user_, profile=profile_)
         profile_.followers.add(user_)
 
-        return HttpResponse(
-            f"{user_.name} followed {profile_.name} \n {profile_.followers.all(),  is_following} \n {follower_count}"
+        return Response(
+            {
+                "isFollowing": True,
+                "followCount": follower_count,
+                "response": f"{user_.username} followed {profile_.user}",
+            }
         )
 
     elif is_following == True:
@@ -91,8 +99,12 @@ def followUser(request, pk=None, *args, **kwargs):
         ).delete()
         profile_.followers.remove(user_)
 
-        return HttpResponse(
-            f"{user_.name} unfollowed {profile_.name}, {is_following}",
+        return Response(
+            {
+                "isFollowing": False,
+                "followCount": follower_count,
+                "response": f"{user_.username} unfollowed {profile_.user}",
+            }
         )
 
 
@@ -101,10 +113,9 @@ class ProfileAPI(viewsets.ViewSet):
     authentication_classes = (TokenAuthentication,)
 
     def retrieve(self, request, pk=None):
-        
+
         try:
             user_ = UserProfile.objects.get(user=pk)
-            print(user_)
 
             UserSerializers = UserProfileSerializer(user_)
 
@@ -141,7 +152,9 @@ class ProfilePostsAPI(viewsets.ViewSet):
             userProfile = UserProfile.objects.get(user=pk)
             userArticles = Article.objects.filter(author=userProfile)
             # userArticles = Article.objects.filter(author=user_)
-            articleSerializer = ArticleSerializer(userArticles, many=True,  context={'request': request})
+            articleSerializer = ArticleSerializer(
+                userArticles, many=True, context={"request": request}
+            )
 
             return Response(articleSerializer.data)
         except error:
