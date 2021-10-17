@@ -18,10 +18,18 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 # AWS S3 Bucketeer
 BUCKETEER_AWS_ACCESS_KEY_ID = "AKIARVGPJVYVJGLDH67U"
-BUCKETEER_AWS_REGION = "us-east-1"
 BUCKETEER_AWS_SECRET_ACCESS_KEY = "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"
 BUCKETEER_BUCKET_NAME = "bucketeer-5ac44f27-df4a-49f8-8795-43f87e3e8470"
 
+AWS_ACCESS_KEY_ID = "AKIAXCDXLP42Q6RB5MM7"
+AWS_REGION = "us-east-2"
+AWS_SECRET_ACCESS_KEY = "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"
+AWS_STORAGE_BUCKET_NAME = "whatsthewordapp-s3"
+AWS_S3_FILE_OVERWRITE = False
+AWS_DEFAULT_ACL = None
+AWS_S3_SIGNATURE_VERSION = "s3v4"
+DEFAULT_FILE_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
+STATICFILES_STORAGE = 'storages.backends.s3boto3.S3StaticStorage'
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/3.2/howto/deployment/checklist/
 
@@ -48,6 +56,7 @@ INSTALLED_APPS = [
     "Post",
     "accounts",
     "knox",
+    "storages",
 ]
 
 MIDDLEWARE = [
@@ -156,7 +165,7 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/3.2/howto/static-files/
 
-STATIC_URL = "/static/"
+STATIC_URL = 'http://' + AWS_STORAGE_BUCKET_NAME + '.s3.amazonaws.com/'
 STATIC_ROOT = os.path.join(BASE_DIR, "staticfiles")
 MEDIA_URL = "/media/"
 MEDIA_ROOT = os.path.join(BASE_DIR, "media")
