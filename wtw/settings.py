@@ -17,9 +17,6 @@ import os
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 # AWS S3 Bucketeer
-BUCKETEER_AWS_ACCESS_KEY_ID = "AKIARVGPJVYVJGLDH67U"
-BUCKETEER_AWS_SECRET_ACCESS_KEY = "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"
-BUCKETEER_BUCKET_NAME = "bucketeer-5ac44f27-df4a-49f8-8795-43f87e3e8470"
 
 AWS_ACCESS_KEY_ID = "AKIAXCDXLP42Q6RB5MM7"
 AWS_REGION = "us-east-2"
@@ -167,7 +164,7 @@ USE_TZ = True
 
 STATIC_URL = 'http://' + AWS_STORAGE_BUCKET_NAME + '.s3.amazonaws.com/'
 STATIC_ROOT = os.path.join(BASE_DIR, "staticfiles")
-MEDIA_URL = "/media/"
+MEDIA_URL = ""
 MEDIA_ROOT = os.path.join(BASE_DIR, "media")
 # Default primary key field type
 # https://docs.djangoproject.com/en/3.2/ref/settings/#default-auto-field
