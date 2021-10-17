@@ -19,9 +19,10 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # AWS S3 Bucketeer
 
 AWS_ACCESS_KEY_ID = "AKIAXCDXLP42Q6RB5MM7"
-AWS_REGION = "us-east-2"
+AWS_S3_REGION_NAME = "us-east-2"
 AWS_SECRET_ACCESS_KEY = "3frI8h2R66ghODvKrp6RkEpuA55Kxh1W8/aSfxhz"
 AWS_STORAGE_BUCKET_NAME = "whatsthewordapp-s3"
+#AWS_QUERYSTRING_AUTH = False
 AWS_S3_FILE_OVERWRITE = False
 AWS_DEFAULT_ACL = None
 AWS_S3_SIGNATURE_VERSION = "s3v4"
