@@ -54,6 +54,7 @@ from .serializer import (
     RegisterSerializer,
     UserProfileSerializer,
     UserSerializer,
+    ViewUserProfileSerializer,
     followSerializer,
 )
 
@@ -66,13 +67,10 @@ def followUser(request, *args, **kwargs):
     is_following = False
     prof = request.data.get("profile")
 
-    
     profile_ = UserProfile.objects.get(user_id=prof)
     profile_username = profile_.user
-    
 
     user_ = User.objects.get(username=request.user)
-    
 
     # check follower count of focused profile
     follower_count = profile_.followers.count()
@@ -114,12 +112,14 @@ class ProfileAPI(viewsets.ViewSet):
     authentication_classes = (TokenAuthentication,)
 
     def retrieve(self, request, pk=None):
-
+        #print(pk)
         try:
             user_ = UserProfile.objects.get(user=pk)
-
-            UserSerializers = UserProfileSerializer(user_)
-
+            #print(user_)
+            if user_ == request.user:
+                UserSerializers = UserProfileSerializer(user_)
+            else : 
+                UserSerializers = ViewUserProfileSerializer(user_, context={"request": request, "pk": pk})
             return Response(UserSerializers.data)
         except error:
             print(error)

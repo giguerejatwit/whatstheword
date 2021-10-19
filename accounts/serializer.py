@@ -37,17 +37,18 @@ class ProfileEditSerializer(serializers.ModelSerializer):
 class UserProfileSerializer(serializers.ModelSerializer):
     email = serializers.SerializerMethodField("_getEmail")
     username = serializers.SerializerMethodField("_getUsername")
+
     def _getEmail(self, profile):
         profile = getattr(profile, "user")
-        
-        user = User.objects.get(phone = profile.phone)
+
+        user = User.objects.get(phone=profile.phone)
         return user.email
-    
+
     def _getUsername(self, profile):
-         profile = getattr(profile, "user")
-         user = User.objects.get(phone = profile.phone)
-         print(user)
-         return user.username
+        profile = getattr(profile, "user")
+        user = User.objects.get(phone=profile.phone)
+
+        return user.username
 
     class Meta:
         model = UserProfile
@@ -56,12 +57,62 @@ class UserProfileSerializer(serializers.ModelSerializer):
             "email",
             "name",
             "bio",
-            "username", 
+            "username",
             "avatar",
             "instagramID",
             "snapchatID",
             "linkedinID",
             "followers",
+        ]
+
+
+class ViewUserProfileSerializer(serializers.ModelSerializer):
+    email = serializers.SerializerMethodField("_getEmail")
+    username = serializers.SerializerMethodField("_getUsername")
+    isFollowing = serializers.SerializerMethodField("_checkFollowing")
+
+    def _checkFollowing(self, profile):
+
+        context_user = self.context["request"].user
+
+        pk = self.context["pk"]
+        pk_user = UserProfile.objects.get(user=pk)
+
+        c_userProfile = User.objects.get(username=context_user)
+
+        if c_userProfile in pk_user.followers.all():
+
+            isFollowing = True
+        else:
+            isFollowing = False
+        
+        return isFollowing
+
+    def _getEmail(self, profile):
+        profile = getattr(profile, "user")
+
+        user = User.objects.get(phone=profile.phone)
+        return user.email
+
+    def _getUsername(self, profile):
+        profile = getattr(profile, "user")
+        user = User.objects.get(phone=profile.phone)
+        return user.username
+
+    class Meta:
+        model = UserProfile
+        fields = [
+            "user",
+            "email",
+            "name",
+            "bio",
+            "username",
+            "avatar",
+            "instagramID",
+            "snapchatID",
+            "linkedinID",
+            "followers",
+            "isFollowing",
         ]
 
 
