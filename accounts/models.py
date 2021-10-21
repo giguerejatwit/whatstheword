@@ -15,7 +15,14 @@ from rest_framework.authtoken.models import Token
 
 class UserManager(BaseUserManager):
     def create_user(
-        self, phone, password, username, is_staff=False, is_active=True, is_admin=False
+        self,
+        phone,
+        password,
+        username,
+        has_agreed_tos,
+        is_staff=False,
+        is_active=True,
+        is_admin=False,
     ):
         if not phone:
             raise ValueError("users must have a phone number")
@@ -23,10 +30,13 @@ class UserManager(BaseUserManager):
             raise ValueError("users must have a username")
         if not password:
             raise ValueError("users must have a password")
+        if not has_agreed_tos:
+            raise ValueError("users must agree to the terms and conditions")
 
         user_obj = self.model(phone=phone)
         user_obj.username = username
         user_obj.set_password(password)
+        user_obj.has_agreed_tos = has_agreed_tos
         user_obj.staff = is_staff
         user_obj.admin = is_admin
         user_obj.active = is_active
@@ -67,7 +77,7 @@ class User(AbstractBaseUser):
 
     username = models.CharField(max_length=20, unique=True)
     standard = models.CharField(max_length=3, blank=True, null=True)
-    
+
     score = models.IntegerField(default=16)
     password = models.CharField(max_length=200)
     first_login = models.BooleanField(default=False)
@@ -83,6 +93,7 @@ class User(AbstractBaseUser):
     USERNAME_FIELD = "phone"
     REQUIRED_FIELDS = [
         "password",
+
     ]
 
     objects = UserManager()
@@ -133,7 +144,7 @@ class UserProfile(models.Model):
         related_name="profile",
         on_delete=models.CASCADE,
     )
-    
+
     name = models.CharField(max_length=30, blank=True, null=True)
     bio = models.TextField(null=True)
     avatar = models.ImageField(

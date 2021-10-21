@@ -112,14 +112,16 @@ class ProfileAPI(viewsets.ViewSet):
     authentication_classes = (TokenAuthentication,)
 
     def retrieve(self, request, pk=None):
-        #print(pk)
+        # print(pk)
         try:
             user_ = UserProfile.objects.get(user=pk)
-            #print(user_)
+            # print(user_)
             if user_ == request.user:
                 UserSerializers = UserProfileSerializer(user_)
-            else : 
-                UserSerializers = ViewUserProfileSerializer(user_, context={"request": request, "pk": pk})
+            else:
+                UserSerializers = ViewUserProfileSerializer(
+                    user_, context={"request": request, "pk": pk}
+                )
             return Response(UserSerializers.data)
         except error:
             print(error)
@@ -172,11 +174,13 @@ class RegisterAPI(generics.GenericAPIView):
     def post(self, request, *args, **kwargs):
         user = None
         data = request.data
-        serializer = RegisterSerializer(data=data)
 
-        if serializer.is_valid():
-            user = serializer.save()
+        serializer = self.get_serializer(data=request.data)
 
+        if serializer.is_valid(raise_exception=True):
+            user = serializer.create(data)
+        else:
+            print("invalid data")
         return Response(
             {
                 # returns the given fields of UserSerializer

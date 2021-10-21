@@ -85,7 +85,7 @@ class ViewUserProfileSerializer(serializers.ModelSerializer):
             isFollowing = True
         else:
             isFollowing = False
-        
+
         return isFollowing
 
     def _getEmail(self, profile):
@@ -144,6 +144,7 @@ class RegisterSerializer(serializers.ModelSerializer):
             "username",
             "email",
             "password",
+            "has_agreed_tos",
         ]
         extra_kwargs = {"password": {"write_only": True}}
 
@@ -152,6 +153,7 @@ class RegisterSerializer(serializers.ModelSerializer):
             validated_data["phone"],
             validated_data["password"],
             validated_data["username"],
+            validated_data["has_agreed_tos"],
         )
         user.save()
         return user

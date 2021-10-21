@@ -207,7 +207,7 @@ class ArticleViewSet(viewsets.ViewSet):
     # #
     def create(self, request):
 
-        article_serializer = ArticleSerializer(data=request.data, context={"request": request})
+        article_serializer = ArticleSerializer(data=request.data, )
         if article_serializer.is_valid():
             # only can create if User is a promoter
             # if self.request.user.is_promoter:
