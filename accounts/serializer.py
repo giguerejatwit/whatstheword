@@ -8,6 +8,7 @@ from copy import error
 from django.db import models
 from django.db.models import fields
 from rest_framework import serializers
+from rest_framework.fields import SerializerMethodField
 from .models import User, UserProfile
 
 
@@ -22,12 +23,24 @@ class UserSerializer(serializers.ModelSerializer):
 
 
 class ProfileEditSerializer(serializers.ModelSerializer):
+    email = SerializerMethodField("_getEmail")
+
+    def _getEmail(self, profile):
+        data = self.context["request"].data
+        email = data.get("email")
+        user = User.objects.get(username=profile.user.username)
+        user.email = email
+        user.save()
+
+        return email
+
     class Meta:
         model = UserProfile
         fields = [
             "name",
             "bio",
             "avatar",
+            "email",
             "instagramID",
             "snapchatID",
             "linkedinID",
@@ -39,8 +52,7 @@ class UserProfileSerializer(serializers.ModelSerializer):
     username = serializers.SerializerMethodField("_getUsername")
 
     def _getEmail(self, profile):
-        profile = getattr(profile, "user")
-
+        profile.user
         user = User.objects.get(phone=profile.phone)
         return user.email
 
