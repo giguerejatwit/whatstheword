@@ -110,7 +110,7 @@ class ViewUserProfileSerializer(serializers.ModelSerializer):
         return isFollowing
 
     def _getEmail(self, profile):
-        email = profile.user.emails
+        email = profile.user.email
         return email
 
     def _getUsername(self, profile):
@@ -136,7 +136,7 @@ class ViewUserProfileSerializer(serializers.ModelSerializer):
 
         def to_representation(self, instance):
             data = super().to_representation(instance)
-            print(data)
+            
             for key, value in data.items():
                 try:
                     if not value:
@@ -171,9 +171,9 @@ class RegisterSerializer(serializers.ModelSerializer):
         model = User
         fields = [
             "phone",
+            "password",
             "username",
             "email",
-            "password",
             "has_agreed_tos",
         ]
         extra_kwargs = {"password": {"write_only": True}}

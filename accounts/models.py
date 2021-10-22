@@ -25,7 +25,8 @@ class UserManager(BaseUserManager):
         is_active=True,
         is_admin=False,
     ):
-        print(self)
+
+        
         if not phone:
             raise ValueError("users must have a phone number")
         if not username:
@@ -101,8 +102,6 @@ class User(AbstractBaseUser):
         "password",
     ]
 
-    
-
     def __str__(self):
         return self.username
 
@@ -150,8 +149,12 @@ class UserProfile(models.Model):
         on_delete=models.CASCADE,
     )
 
-    name = models.CharField(max_length=30, blank=True, null=True)
-    bio = models.TextField(null=True)
+    name = models.CharField(
+        max_length=30,
+        blank=True,
+        
+    )
+    bio = models.TextField(blank=True)
     avatar = models.ImageField(
         upload_to="media/profilePictures",
         default="/media/profilePictures/default-avatar.png",
@@ -176,6 +179,7 @@ class UserProfile(models.Model):
 def create_or_update_user_profile(sender, instance, created, **kwargs):
     if created:
         UserProfile.objects.create(user=instance)
+        instance.profile.name = instance.username
     instance.profile.save()
 
     def __str__(self):

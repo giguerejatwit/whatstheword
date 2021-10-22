@@ -184,8 +184,7 @@ class RegisterAPI(generics.GenericAPIView):
         serializer = self.get_serializer(data=data)
 
         if serializer.is_valid(raise_exception=True):
-            print(serializer.data)
-            print(data )
+            
             user = serializer.create(data)
         else:
             print("invalid data")
