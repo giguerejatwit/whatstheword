@@ -52,15 +52,13 @@ class UserProfileSerializer(serializers.ModelSerializer):
     username = serializers.SerializerMethodField("_getUsername")
 
     def _getEmail(self, profile):
-        profile.user
-        user = User.objects.get(phone=profile.phone)
+        profile_username = profile.user.username
+        user = User.objects.get(username= profile_username)
         return user.email
 
     def _getUsername(self, profile):
-        profile = getattr(profile, "user")
-        user = User.objects.get(phone=profile.phone)
-
-        return user.username
+        username = profile.user.username
+        return username
 
     class Meta:
         model = UserProfile
@@ -76,6 +74,17 @@ class UserProfileSerializer(serializers.ModelSerializer):
             "linkedinID",
             "followers",
         ]
+
+        def to_representation(self, instance):
+            data = super().to_representation(instance)
+            print(data)
+            for key, value in data.items():
+                try:
+                    if not value:
+                        data[key] = ""
+                except KeyError:
+                    pass
+            return data
 
 
 class ViewUserProfileSerializer(serializers.ModelSerializer):
@@ -101,15 +110,13 @@ class ViewUserProfileSerializer(serializers.ModelSerializer):
         return isFollowing
 
     def _getEmail(self, profile):
-        profile = getattr(profile, "user")
-
-        user = User.objects.get(phone=profile.phone)
-        return user.email
+        email = profile.user.emails
+        return email
 
     def _getUsername(self, profile):
-        profile = getattr(profile, "user")
-        user = User.objects.get(phone=profile.phone)
-        return user.username
+        username =profile.user.username
+  
+        return username
 
     class Meta:
         model = UserProfile
@@ -126,6 +133,17 @@ class ViewUserProfileSerializer(serializers.ModelSerializer):
             "followers",
             "isFollowing",
         ]
+
+        def to_representation(self, instance):
+            data = super().to_representation(instance)
+            print(data)
+            for key, value in data.items():
+                try:
+                    if not value:
+                        data[key] = ""
+                except KeyError:
+                    pass
+            return data
 
 
 class followSerializer(serializers.ModelSerializer):
@@ -165,6 +183,7 @@ class RegisterSerializer(serializers.ModelSerializer):
             validated_data["phone"],
             validated_data["password"],
             validated_data["username"],
+            validated_data["email"],
             validated_data["has_agreed_tos"],
         )
         user.save()

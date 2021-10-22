@@ -19,22 +19,27 @@ class UserManager(BaseUserManager):
         phone,
         password,
         username,
+        email,
         has_agreed_tos,
         is_staff=False,
         is_active=True,
         is_admin=False,
     ):
+        print(self)
         if not phone:
             raise ValueError("users must have a phone number")
         if not username:
             raise ValueError("users must have a username")
         if not password:
             raise ValueError("users must have a password")
+        if not email:
+            raise ValueError("users must have an email")
         if not has_agreed_tos:
             raise ValueError("users must agree to the terms and conditions")
 
         user_obj = self.model(phone=phone)
         user_obj.username = username
+        user_obj.email = email
         user_obj.set_password(password)
         user_obj.has_agreed_tos = has_agreed_tos
         user_obj.staff = is_staff
@@ -62,6 +67,7 @@ class UserManager(BaseUserManager):
 
 
 class User(AbstractBaseUser):
+    objects = UserManager()
     phone_regex = RegexValidator(
         regex=r"^\+?1?\d{9,14}$",
         message="Phone number must be entered in the format: '+999999999'. Up to 14 digits allowed.",
@@ -93,10 +99,9 @@ class User(AbstractBaseUser):
     USERNAME_FIELD = "phone"
     REQUIRED_FIELDS = [
         "password",
-
     ]
 
-    objects = UserManager()
+    
 
     def __str__(self):
         return self.username
@@ -157,9 +162,9 @@ class UserProfile(models.Model):
         related_name="followers",
         symmetrical=False,
     )
-    instagramID = models.CharField(max_length=30, null=True, blank=True)
-    snapchatID = models.CharField(max_length=30, null=True, blank=True)
-    linkedinID = models.CharField(max_length=30, null=True, blank=True)
+    instagramID = models.CharField(max_length=30, blank=True)
+    snapchatID = models.CharField(max_length=30, blank=True)
+    linkedinID = models.CharField(max_length=30, blank=True)
     # following = models.ManyToManyField(settings.AUTH_USER_MODEL, blank = True, related_name= "following", symmetrical=False)
     # blocked = models.ManyToManyField(settings.AUTH_USER_MODEL, blank = True, related_name= "followers", symmetrical=False)
     # is_private

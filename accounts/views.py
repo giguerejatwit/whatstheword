@@ -48,7 +48,7 @@ from rest_framework.serializers import Serializer
 
 # from .decorators import promoter_only
 from .models import FollowerRelation, User, UserProfile
-from .serializer import (
+from .serializers import (
     ChangePasswordSerializer,
     ProfileEditSerializer,
     RegisterSerializer,
@@ -114,13 +114,17 @@ class ProfileAPI(viewsets.ViewSet):
     def retrieve(self, request, pk=None):
         # print(pk)
         try:
-            user_ = UserProfile.objects.get(user=pk)
-            # print(user_)
-            if user_ == request.user:
-                UserSerializers = UserProfileSerializer(user_)
+            profile = UserProfile.objects.get(user=pk)
+            user = request.user
+
+            user_username = user.username
+            str(user_username)
+            if profile.user.username == user_username:
+                
+                UserSerializers = UserProfileSerializer(profile)
             else:
                 UserSerializers = ViewUserProfileSerializer(
-                    user_, context={"request": request, "pk": pk}
+                    profile, context={"request": request, "pk": pk}
                 )
             return Response(UserSerializers.data)
         except error:
@@ -137,7 +141,9 @@ class ProfileAPI(viewsets.ViewSet):
             if user != profile.user:
                 return HttpResponse("invalid credentials")
             else:
-                serializers = ProfileEditSerializer(profile, data=request.data)
+                serializers = ProfileEditSerializer(
+                    profile, data=request.data, context={"request": request}
+                )
                 if serializers.is_valid():
                     serializers.save()
                 # return Response(serializers.data, status=status.HTTP_201_CREATED)
@@ -174,10 +180,12 @@ class RegisterAPI(generics.GenericAPIView):
     def post(self, request, *args, **kwargs):
         user = None
         data = request.data
-
-        serializer = self.get_serializer(data=request.data)
+        
+        serializer = self.get_serializer(data=data)
 
         if serializer.is_valid(raise_exception=True):
+            print(serializer.data)
+            print(data )
             user = serializer.create(data)
         else:
             print("invalid data")
