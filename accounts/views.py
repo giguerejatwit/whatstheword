@@ -198,7 +198,6 @@ class RegisterAPI(generics.GenericAPIView):
             }
         )
 
-
 #
 # LoginAPI
 #
