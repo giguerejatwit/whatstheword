@@ -35,7 +35,7 @@ STATICFILES_STORAGE = 'storages.backends.s3boto3.S3StaticStorage'
 SECRET_KEY = "django-insecure-jfvz45_2-&z3u15rlh&sed47a$2^ka$lot3f#@zr4o^h4by8is"
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
 ALLOWED_HOSTS = ["whatsthewordapp.herokuapp.com", "127.0.0.1"]
 
