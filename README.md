@@ -1,5 +1,3 @@
 # whatstheword
-this is a private project under WTWord LLC.
-All memebers working on this project has signed a NDA document
+This is the backend source code for Whats the Word App under WTWord LLC written in Python.
 
-README.md awaiting update...
