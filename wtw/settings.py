@@ -18,9 +18,9 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 # AWS S3 Bucketeer
 
-AWS_ACCESS_KEY_ID = "AKIAXCDXLP42Q6RB5MM7"
+AWS_ACCESS_KEY_ID = ""
 AWS_S3_REGION_NAME = "us-east-2"
-AWS_SECRET_ACCESS_KEY = "3frI8h2R66ghODvKrp6RkEpuA55Kxh1W8/aSfxhz"
+AWS_SECRET_ACCESS_KEY = ""
 AWS_STORAGE_BUCKET_NAME = "whatsthewordapp-s3"
 #AWS_QUERYSTRING_AUTH = False
 AWS_S3_FILE_OVERWRITE = False
@@ -32,7 +32,7 @@ STATICFILES_STORAGE = 'storages.backends.s3boto3.S3StaticStorage'
 # See https://docs.djangoproject.com/en/3.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = "django-insecure-jfvz45_2-&z3u15rlh&sed47a$2^ka$lot3f#@zr4o^h4by8is"
+SECRET_KEY = ""
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = False
@@ -96,7 +96,7 @@ DATABASES = {
         "ENGINE": "django.db.backends.postgresql_psycopg2",
         "NAME": "ds5pc1pu8s47b",
         "USER": "nzebzromjasjso",
-        "PASSWORD": "889d898f7999ac29a965193a3ac1333c5df4d41c77f4109bee9a337c145a17e4",
+        "PASSWORD": "",
         "HOST": "ec2-54-211-160-34.compute-1.amazonaws.com",
         "PORT": "5432",
     }
